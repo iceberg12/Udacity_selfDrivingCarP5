@@ -9,8 +9,7 @@ This Project is the fifth task of the Udacity Self-Driving Car Nanodegree progra
 * Step 1: Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images. Also apply a color transform and append binned color features, as well as histograms of color, to the HOG feature vector.
 * Step 2: Train a classifier Linear SVM classifier
 * Step 3: Implement a sliding-window technique and use a trained SVM classifier to search for vehicles in images.
-* Step 4: Run the pipeline on a video stream (project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
-* Step 5: Estimate a bounding box for vehicles detected.
+* Step 4: Run the pipeline on a video stream (project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles. Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
 [LUV]: ./output_images/LUV.png
@@ -56,7 +55,7 @@ About the code, the utility function `slide_window` defines a list of small slid
 
 Now if we review the result above, there are windows that falsely detected as cars (Test Image 5). However, we notice that there is only a single window detected. Cars in this images are still detected with at least two windows. This provides us a way to know more certainly if there is a car. By using a heatmap which increase the value of each pixel by 1 if it is covered by one window, we can see cars are seen clearer (right-hand column). During video processing, this technique can be employed further by taking a heatmap across a few frames.
 
-### Video Implementation
+### Step 4: Video Implementation
 
 #### 1. Performance
 
