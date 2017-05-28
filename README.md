@@ -22,6 +22,7 @@ First, we started by reading in all the `vehicle` and `non-vehicle` images. Labe
 
 **Note**: If you want to make the classifier works well, please consider to augment the images, at least by flipping them. This works really well for me.
 
+
 ### Step 1. Perform feature extraction using Histogram of Oriented Gradients (HOG), color transformation and color histogram  on a labeled training set of images.
 
 To explore HOG features, I tried various combinations of color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  The well-performed and most simple HOG feature extraction I can find use the L channel of `LUV` color space, and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`. Random images from each of the two classes are displayed here to get a feel for what the `skimage.hog()` output looks like.
@@ -32,15 +33,15 @@ Although HOG features are great, calculating histogram of colors and spatial col
 
 Stacking the feature vectors from these three methods give us 2432 features. This would be more if you are going to extract HOG features on all three channels, but for me I only use L-channel of LUV to give my SVM classfier an easy life (U and V channels are not representative anyway). Last but not least, remember to standardise the feature space (I use `StandardScaler` from sk-learn) before modelling to treat these features equal in magnitude.
 
+
 ### Step 2: Train Linear SVM Classifier
 
 The car and no-car data is shuffled, then split into train and test data with the ratio 80 / 20.
 
 I used GridSearchCV to look out for a good parameter `C` of the Linear SVM classifer (sk-learn). The optimal parameter is `C = 0.001`. Test accuracy is around 0.9852, so it is ok for me to move forward. However, I believe a ConvNet can do a better job. At least that's what I will try next after this project. It will be interesting to see how much ConvNet can improve over SVM, because SVM gives me some false positive in car detection, which I will show you next.
 
-### Step 3: Sliding Window Search
 
-#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+### Step 3: Sliding Window Search
 
 Here are a few ways I learned from watching Udacity lectures, discussing on the Udacity forum and talking to my mentor:
 
@@ -55,19 +56,22 @@ About the code, the utility function `slide_window` defines a list of small slid
 
 Now if we review the result above, there are windows that falsely detected as cars (Test Image 5). However, we notice that there is only a single window detected. Cars in this images are still detected with at least two windows. This provides us a way to know more certainly if there is a car. By using a heatmap which increase the value of each pixel by 1 if it is covered by one window, we can see cars are seen clearer (right-hand column). During video processing, this technique can be employed further by taking a heatmap across a few frames.
 
+
 ### Step 4: Video Implementation
 
-#### 1. Performance
+#### 1. Filter for false positives and a method for combining overlapping bounding boxes.
 
-Here's a [link to my video result](./output_images/project_video_processed.mp4)
-
-#### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
-
-I recorded the positions of positive detections as heatmap in each frame of the video, called `heat_series`.  For each new frame, I take a weighted sum of these `heat_series` then thresholded that summed heatmap to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap, assuming each blob corresponded to a vehicle. Bounding boxes to cover the area of each blob is constructed.  
+I recorded the positions of positive detections as heatmap in each frame of the video, called `heat_series`.  For each new frame, I take a weighted sum of these `heat_series` then thresholded that summed heatmap to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap, assuming each blob corresponded to a vehicle. Bounding boxes to cover the area of each blob is constructed by `draw_labeled_bboxes`.  
 
 Here's an example result showing the heatmap from a series of frames of video.
 
 ![alt text][time_series]
+
+#### 2. Performance
+
+Here's a [link to my video result](./output_images/project_video_processed.mp4)
+
+
 
 ---
 
