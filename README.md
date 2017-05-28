@@ -13,14 +13,9 @@ This Project is the fifth task of the Udacity Self-Driving Car Nanodegree progra
 * Step 5: Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
-[image1]: ./output_images/car_not_car.png
-[image2]: ./output_images/HOG_example.jpg
-[image3]: ./output_images/sliding_windows.jpg
-[image4]: ./output_images/sliding_window.jpg
-[image5]: ./output_images/bboxes_and_heat.png
-[image6]: ./output_images/labels_map.png
-[image7]: ./output_images/output_bboxes.png
-[video1]: ./project_video.mp4
+[LUV]: ./output_images/LUV.png
+[multi_detect]: ./output_images/multi_detect.png
+[time_series]: ./output_images/time_series.png
 
 ---
 
@@ -52,7 +47,6 @@ Here are a few ways I learned from watching Udacity lectures, discussing on the 
 
 1. Cars don't fly on the sky, so searching on the lower horizon would reduce the search time.
 2. Window search size and overlap should be wisely selected. The sizes I choose are 64 and 128 pixel (it's a multi-scale searching). For 64-pixel windows I search at height range [400, 520] for far-way cars, and for 128-pixel windows I search at height range [400, 640] for nearer cars. Overlap should be as high as you can afford, but I keep it around 0.8 (meaning, ~ 52 pixels for 64-pixel windows) to make my searching below 1 second per image.
-3. 
 
 The left-hand column shows the detected windows overlaid on top of the original image.
 
@@ -64,33 +58,22 @@ Now if we review the result above, there are windows that falsely detected as ca
 
 ### Video Implementation
 
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+#### 1. Performance
 
+Here's a [link to my video result](./output_images/project_video_processed.mp4)
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+I recorded the positions of positive detections as heatmap in each frame of the video, called `heat_series`.  For each new frame, I take a weighted sum of these `heat_series` then thresholded that summed heatmap to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap, assuming each blob corresponded to a vehicle. Bounding boxes to cover the area of each blob is constructed.  
 
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
+Here's an example result showing the heatmap from a series of frames of video.
 
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
+![alt text][time_series]
 
 ---
 
 ### Discussion
 
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+1. The SVM classifier gives me some false positive, so I hope I can solve this issue with a ConvNet in my next try.
+2. The algorithm may have some problems in case of overlapped cars. To resolve this problem one may introduce long term memory of car centers using centroid of detected windows to track how many cars in the frame and where they are.
 
